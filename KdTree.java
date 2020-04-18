@@ -50,20 +50,63 @@ public class KdTree {
             newPt.intercept = VERTICAL;
             root = newPt;
             size += 1;
+            return;
         }
 
         while (true) {
-            if (p.equals(currPos.value)) return;
+            if (p.equals(currPos.value)) {
+                return;
+            }
 
             if (currPos.intercept == VERTICAL) {
 
                 if (p.x() < currPos.value.x()) {
+                    if (currPos.left == null) {
+                        newPt.intercept = HORIZONTAL;
+                        currPos.left = newPt;
+                        size += 1;
+                    } else {
+                        currPos = currPos.left;
+                    }
+                } else {
 
+                    if (currPos.right == null) {
+                        newPt.intercept = HORIZONTAL;
+                        currPos.right = newPt;
+                        size += 1;
+                    } else {
+                        currPos = currPos.right;
+                    }
+                }
+            } else {
+
+                if (p.y() < currPos.value.y()) {
+                    if (currPos.left == null) {
+                        newPt.intercept = VERTICAL;
+                        currPos.left = newPt;
+                        size += 1;
+                    } else {
+                        currPos = currPos.left;
+                    }
+
+                } else {
+                    if (currPos.right == null) {
+                        newPt.intercept = VERTICAL;
+                        currPos.right = newPt;
+                        size += 1;
+                    } else {
+                        currPos = currPos.right;
+                    }
                 }
             }
 
         }
 
+    }
+
+    public static void main(String[] args) {
+        KdTree tree = new KdTree();
+        tree.insert(new Point2D(0.4, 0.2));
     }
 
 }
