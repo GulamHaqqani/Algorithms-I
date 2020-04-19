@@ -1,4 +1,8 @@
 import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.StdOut;
+
+import java.util.LinkedList;
 
 public class KdTree {
     private static final boolean VERTICAL = true;
@@ -7,6 +11,7 @@ public class KdTree {
     private Point2D champ;
     private Point2D comp;
     private int size;
+    private LinkedList<Point2D> pointsinRange;
 
     private class Node {
         Point2D value;
@@ -45,6 +50,8 @@ public class KdTree {
     public void insert(Point2D p) {
         Node newPt = new Node(p);
         Node currPos = root;
+
+        if (p == null) throw new IllegalArgumentException("Point cannot be null");
 
         if (root == null) {
             newPt.intercept = VERTICAL;
@@ -104,9 +111,85 @@ public class KdTree {
 
     }
 
+    public boolean contains(Point2D p) {
+        Node currPos = root;
+
+        if (p == null) throw new IllegalArgumentException("Points cannot be null");
+
+        while (currPos != null) {
+            if (p.equals(currPos.value)) {
+                return true;
+            }
+            if (currPos.intercept == VERTICAL) {
+                if (p.x() < currPos.value.x()) {
+                    currPos = currPos.left;
+                } else currPos = currPos.right;
+
+            } else {
+                if (p.y() < currPos.value.y()) {
+                    currPos = currPos.left;
+                } else currPos = currPos.right;
+            }
+        }
+        return false;
+
+    }
+
+    public Iterable<Point2D> range(RectHV rect) {
+        pointsinRange = new LinkedList<Point2D>();
+
+        search(root, rect);
+        return pointsinRange;
+
+    }
+
+    public void search(Node node, RectHV rect) {
+
+        if (node == null) throw new IllegalArgumentException("Points cannot be empty");
+
+        if (node.intercept == VERTICAL) {
+
+            if (node.value.x() < rect.xmin()) {
+                search(node.right, rect);
+            } else if (node.value.x() > rect.xmax()) {
+                search(node.left, rect);
+
+            } else {
+                search(node.left, rect);
+                search(node.right, rect);
+
+                if (rect.contains(node.value)) {
+                    pointsinRange.add(node.value);
+                }
+            }
+        } else {
+
+
+            if (node.value.y() < rect.ymin()) {
+                search(node.right, rect);
+            } else if (node.value.y() > rect.ymax()) {
+                search(node.left, rect);
+            } else {
+                search(node.left, rect);
+                search(node.right, rect);
+
+                if (rect.contains(node.value)) {
+                    pointsinRange.add(node.value);
+                }
+            }
+        }
+
+    }
+
+
     public static void main(String[] args) {
         KdTree tree = new KdTree();
         tree.insert(new Point2D(0.4, 0.2));
+
+        StdOut.println(tree.contains(new Point2D(0.4, 0.2)));
+        StdOut.println("Is the tree empty?:" + tree.isEmpty());
+        StdOut.println("The size of the tree is:" + tree.size());
     }
+
 
 }
