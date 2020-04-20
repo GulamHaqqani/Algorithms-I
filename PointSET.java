@@ -63,8 +63,6 @@ public class PointSET {
     }
 
 
-}
-
     public static void main(String[] args) {
 
         PointSET pSet = new PointSET();
@@ -87,3 +85,6 @@ public class PointSET {
 
         }
     }
+}
+
+
