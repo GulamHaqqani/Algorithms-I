@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.LinkedList;
@@ -135,6 +136,23 @@ public class KdTree {
 
     }
 
+    public void draw() {
+        draw(root);
+    }
+
+    private void draw(Node a) {
+        if (a == null) throw new IllegalArgumentException();
+        a.value.draw();
+
+        if (a.right != null) {
+            draw(a.right);
+        }
+        if (a.left != null) {
+            draw(a.left);
+        }
+
+    }
+
     public Iterable<Point2D> range(RectHV rect) {
         pointsinRange = new LinkedList<Point2D>();
 
@@ -143,9 +161,9 @@ public class KdTree {
 
     }
 
-    public void search(Node node, RectHV rect) {
+    private void search(Node node, RectHV rect) {
 
-        if (node == null) throw new IllegalArgumentException("Points cannot be empty");
+        if (node == null) return;
 
         if (node.intercept == VERTICAL) {
 
@@ -179,16 +197,94 @@ public class KdTree {
             }
         }
 
+
+    }
+
+    public Point2D nearest(Point2D p) {
+        champ = null;
+        comp = p;
+
+        checkNearest(root);
+
+        return champ;
+
+    }
+
+    private void checkNearest(Node node) {
+        if (node == null) return;
+
+        if (champ == null) champ = node.value;
+        else if (comp.distanceTo(champ) > comp.distanceTo(node.value)) champ = node.value;
+
+        if (node.intercept == VERTICAL) {
+            if (comp.distanceTo(champ) > comp.distanceTo(node.value)) {
+                if (node.value.x() >= comp.x()) {
+                    checkNearest(node.left);
+                    checkNearest(node.right);
+                } else {
+                    checkNearest(node.right);
+                    checkNearest(node.left);
+                }
+            } else {
+                if (node.value.x() > comp.x()) checkNearest(node.left);
+                else if (node.value.x() < comp.x()) checkNearest(node.right);
+                else {
+                    checkNearest(node.left);
+                    checkNearest(node.right);
+                }
+            }
+        } else {
+
+            if (comp.distanceTo(champ) > comp.distanceTo(node.value)) {
+                if (node.value.y() >= comp.y()) {
+                    checkNearest(node.left);
+                    checkNearest(node.right);
+                } else {
+                    checkNearest(node.right);
+                    checkNearest(node.left);
+                }
+
+            } else {
+                if (node.value.y() > champ.y()) checkNearest(node.left);
+                else if (node.value.y() < champ.y()) checkNearest(node.right);
+                else {
+                    checkNearest(node.left);
+                    checkNearest(node.right);
+                }
+            }
+        }
+
     }
 
 
     public static void main(String[] args) {
         KdTree tree = new KdTree();
         tree.insert(new Point2D(0.4, 0.2));
+        tree.insert(new Point2D(0.2, 0.1));
+        tree.insert(new Point2D(0.7, 0.3));
+        tree.insert(new Point2D(0.3, 0.6));
 
         StdOut.println(tree.contains(new Point2D(0.4, 0.2)));
-        StdOut.println("Is the tree empty?:" + tree.isEmpty());
-        StdOut.println("The size of the tree is:" + tree.size());
+
+        StdDraw.setPenRadius(0.01);
+        tree.draw();
+        RectHV rect = new RectHV(0.3, 0.1, 0.9, 0.9);
+        StdDraw.setPenColor(StdDraw.BLUE);
+        StdDraw.setPenRadius(0.002);
+        rect.draw();
+
+        for (Point2D point : tree.range(rect)) {
+            StdOut.println(point.toString());
+        }
+
+        StdOut.println();
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.setPenRadius(0.01);
+        Point2D comp = new Point2D(0.4, 0.5);
+        comp.draw();
+
+        StdOut.println(tree.nearest(comp).toString());
+
     }
 
 
