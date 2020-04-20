@@ -278,7 +278,7 @@ public class KdTree {
         }
 
         StdOut.println();
-        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.setPenColor(StdDraw.PINK);
         StdDraw.setPenRadius(0.01);
         Point2D comp = new Point2D(0.4, 0.5);
         comp.draw();
